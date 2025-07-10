@@ -25,7 +25,7 @@ export async function POST(req: NextRequest){
 
     try {
         
-        const decoded: any = jwt.verify(token, JWT_SECRET ) as DecodedToken
+        const decoded = jwt.verify(token, JWT_SECRET ) as DecodedToken
         const {amount} = await req.json()
 
         const amt = parseFloat(amount)
