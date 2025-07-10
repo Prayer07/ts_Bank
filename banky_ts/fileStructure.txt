@@ -1,0 +1,31 @@
+bankchat-app/
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx (home)
+│   ├── dashboard/
+│   │   └── page.tsx
+│   ├── login/
+│   │   └── page.tsx
+│   ├── signup/
+│   │   └── page.tsx
+│   ├── receipt/[id]/page.tsx
+│   └── chat/ (future)
+├── components/
+│   ├── FormInput.tsx
+│   ├── Navbar.tsx
+│   ├── ProtectedRoute.tsx
+├── lib/
+│   ├── db.ts (MongoDB connection)
+│   ├── auth.ts (JWT utils)
+│   ├── validators.ts
+├── models/
+│   ├── User.ts
+│   └── Transaction.ts
+├── types/
+│   └── index.ts
+├── middleware.ts (JWT protection)
+├── .env.local
+├── tailwind.config.ts
+├── next.config.js
+├── tsconfig.json
+└── package.json
