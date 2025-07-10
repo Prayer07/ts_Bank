@@ -103,7 +103,7 @@ export default function LoginPage() {
         >
           {loading ? 'Logging in...' : 'Login'}
         </button>
-        <p style={{textAlign:"center"}}>Don't have an account...? <Link style={{color:"blue", textDecoration:"underline"}} href={"/signup"}>Signup</Link></p>
+        <p style={{textAlign:"center"}}>Don&apos;t have an account...? <Link style={{color:"blue", textDecoration:"underline"}} href={"/signup"}>Signup</Link></p>
       </form>
     </div>
   )

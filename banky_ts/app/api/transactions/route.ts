@@ -35,7 +35,11 @@ export async function GET(req: NextRequest){
 
         return NextResponse.json({transactions: user.transactions.reverse()})
 
-    } catch (err) {
-        return NextResponse.json({error: "Server error"}, {status: 500})
+    } catch (err: unknown) {
+        if (err instanceof Error) {
+            return NextResponse.json({ error: err.message }, { status: 500 })
+        }
+        return NextResponse.json({ error: "Something went wrong" }, { status: 500 })
     }
+
 }

@@ -53,8 +53,12 @@ export async function POST(req: NextRequest){
 
         return NextResponse.json({message: "Money added", balance: user.balance})
 
-    } catch (err) {
-        console.error(err)
-        return NextResponse.json({error: "Invalid token or server error"}, {status: 500})
+    } catch (err: unknown) {
+        if (err instanceof Error) {
+            return NextResponse.json({ error: err.message }, { status: 500 })
+        }
+
+        return NextResponse.json({ error: 'Something went wrong' }, { status: 500 })
     }
+
 }
