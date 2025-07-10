@@ -62,6 +62,7 @@ export async function POST(req: NextRequest){
         type: 'transfer',
         amount: amt,
         to: phone,
+        from: sender.phone,
         })
 
         receiver.transactions.push({
