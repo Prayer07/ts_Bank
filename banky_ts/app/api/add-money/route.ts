@@ -9,6 +9,13 @@ console.log("add-money" + JWT_SECRET )
 export async function POST(req: NextRequest){
     await connectDB()
 
+    interface DecodedToken {
+        _id: string
+        fname: string
+        phone: string
+        exp: number
+    }
+
     const auth = req.headers.get('authorization')
     const token = auth?.split(' ')[1]
 
@@ -18,7 +25,7 @@ export async function POST(req: NextRequest){
 
     try {
         
-        const decoded: any = jwt.verify(token, JWT_SECRET )
+        const decoded: any = jwt.verify(token, JWT_SECRET ) as DecodedToken
         const {amount} = await req.json()
 
         const amt = parseFloat(amount)

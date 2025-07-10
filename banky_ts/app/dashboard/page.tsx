@@ -59,7 +59,7 @@ export default function DashboardPage() {
       sessionStorage.removeItem('token')
       router.push('/login')
     }
-  }, [])
+  })
 
   if (!user)
     return (

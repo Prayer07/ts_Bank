@@ -12,13 +12,20 @@ export async function POST(req: NextRequest){
     const auth = req.headers.get('authorization')
     const token = auth?.split(' ')[1]
 
+    interface DecodedToken {
+        _id: string
+        fname: string
+        phone: string
+        exp: number
+    }
+
     if (!token){
         return NextResponse.json({error: "Unauthorized"}, {status: 401})
     }
 
     try {
         
-        const decoded: any = jwt.verify(token, JWT_SECRET )
+        const decoded = jwt.verify(token, JWT_SECRET ) as DecodedToken
         const {phone, amount} = await req.json()
 
         const sender = await User.findById(decoded._id)

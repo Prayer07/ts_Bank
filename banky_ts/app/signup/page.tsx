@@ -54,8 +54,12 @@ export default function SignupPage() {
         router.push('/login')
       }, 1500)
 
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      if(err instanceof Error){
+        setError(err.message)
+      }else{
+        setError('An unexpected error occurred')
+      }
     } finally {
       setLoading(false)
     }
