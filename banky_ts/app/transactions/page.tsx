@@ -1,14 +1,17 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 interface Transaction {
+  _id: string
   type: string
   amount: number
   to?: string
   from?: string
   date: string
 }
+
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -30,21 +33,23 @@ export default function TransactionsPage() {
     <div className="min-h-screen p-6 bg-gray-100">
       <h1 className="text-xl font-bold mb-4">Transaction History</h1>
       <ul className="space-y-3">
-        {transactions.map((tx, index) => (
-          <li
-            key={index}
-            className="bg-white p-4 rounded shadow text-sm flex justify-between items-center"
-          >
-            <div>
-              <p className="font-semibold capitalize">{tx.type}</p>
-              {tx.to && <p className="text-xs text-gray-500">To: {tx.to}</p>}
-              {tx.from && <p className="text-xs text-gray-500">From: {tx.from}</p>}
-            </div>
-            <div className={`font-bold ${tx.type === 'withdraw' ? 'text-red-500' : 'text-green-600'}`}>
-              ₦{tx.amount.toLocaleString()}
-            </div>
-          </li>
-        ))}
+        {transactions.map((tx, i) => (
+  <div key={i} className="bg-white shadow p-4 rounded mb-4">
+    <p><strong>Type:</strong> {tx.type.toUpperCase()}</p>
+    <p><strong>Amount:</strong> ₦{tx.amount.toLocaleString()}</p>
+    {tx.to && <p><strong>To:</strong> {tx.to}</p>}
+    {tx.from && <p><strong>From:</strong> {tx.from}</p>}
+    <p><strong>Date:</strong> {new Date(tx.date).toLocaleString()}</p>
+
+    {/* 👇 View Receipt Link */}
+    <Link href={`/receipt/${tx._id}`}>
+      <button className="mt-2 text-blue-600 hover:underline">
+        View Receipt →
+      </button>
+    </Link>
+  </div>
+))}
+
       </ul>
     </div>
   )

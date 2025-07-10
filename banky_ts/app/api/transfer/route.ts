@@ -50,6 +50,14 @@ export async function POST(req: NextRequest){
         sender.balance -= amt
         receiver.balance += amt
 
+        const newTx = {
+        type: 'transfer',
+        amount: amt,
+        to: phone,
+        }
+
+        sender.transactions.push(newTx)
+
         sender.transactions.push({
         type: 'transfer',
         amount: amt,
@@ -65,8 +73,11 @@ export async function POST(req: NextRequest){
         await sender.save()
         await receiver.save()
 
-        return NextResponse.json({message: "Transfer successful"})
 
+        return NextResponse.json({
+        success: true,
+        receiptId: sender.transactions[sender.transactions.length - 1]._id.toString(), // ✅ use the last pushed
+        })
     } catch (err) {
         console.error(err)
         return NextResponse.json({error: "Invalid token or server error"}, {status: 500})

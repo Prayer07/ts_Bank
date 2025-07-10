@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
 
 export default function TransferPage() {
   const router = useRouter()
@@ -32,8 +33,8 @@ export default function TransferPage() {
     if (!res.ok) {
       setMessage(data.error || 'Transfer failed')
     } else {
-      setMessage('✅ Transfer successful!')
-      setTimeout(() => router.push('/dashboard'), 1500)
+      toast.success('Transfer successful! Redirecting to receipt...')
+      setTimeout(() =>   router.push(`/receipt/${data.receiptId}`), 1500)
     }
   }
 
