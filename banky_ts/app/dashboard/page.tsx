@@ -6,6 +6,7 @@ import {jwtDecode} from 'jwt-decode'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import AnimatedCounter from '../../components/AnimatedCounter'
+import Logout from '../../components/Logout'
 
 interface DecodedToken {
   _id: string
@@ -168,9 +169,7 @@ export default function DashboardPage() {
               <Link href="/pay-bills" className="block hover:underline">
                 💡 Pay Bills
               </Link>
-              <Link href="/logout" className="block hover:underline text-red-500">
-                🚪 Logout
-              </Link>
+                🚪 <Logout/>
             </div>
           </motion.div>
         )}
