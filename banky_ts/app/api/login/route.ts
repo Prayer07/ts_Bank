@@ -36,7 +36,14 @@ export async function POST(req: Request) {
             {expiresIn: '1d'}
         )
 
-        return NextResponse.json({token, fname: user.fname}, {status: 200})
+        return NextResponse.json({
+        token,
+        user: {
+            _id: user._id,
+            phone: user.phone,
+            fname: user.fname,
+            balance: user.balance,
+        }}, {status: 200})
 
     } catch (err) {
         console.error(err)

@@ -47,7 +47,8 @@ export default function LoginPage() {
 
       // Save token and fname to sessionStorage
       sessionStorage.setItem('token', data.token)
-      sessionStorage.setItem('fname', data.fname)
+      sessionStorage.setItem('user', JSON.stringify(data.user))
+      sessionStorage.setItem('phone', data.phone)
 
       setTimeout(() => {
         router.push('/dashboard')

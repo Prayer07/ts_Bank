@@ -38,6 +38,12 @@ export default function DashboardPage() {
     const token = sessionStorage.getItem('token')
     if (!token) return router.push('/login')
 
+    const stored = sessionStorage.getItem("user");
+    const user = stored ? JSON.parse(stored) : null;
+
+  console.log(user?._id); // for example
+
+
     try {
       const decoded: DecodedToken = jwtDecode(token)
 
