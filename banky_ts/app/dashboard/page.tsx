@@ -76,7 +76,7 @@ export default function DashboardPage() {
     )
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-gray-100 to-blue-50 p-4 overflow-x-hidden">
+    <div className="relative min-h-screen from-gray-100 p-4 overflow-x-hidden dash-box">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <motion.h2
@@ -97,8 +97,8 @@ export default function DashboardPage() {
       </div>
 
       {/* Card */}
-      <motion.div
-        className="bg-white rounded-2xl shadow-lg p-6 mb-8 flex justify-between items-start"
+      <motion.div 
+        className="bg-white rounded-2xl shadow-lg p-6 mb-8 flex justify-between items-start money-box"
         initial={{ y: -30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -153,7 +153,7 @@ export default function DashboardPage() {
       <AnimatePresence>
         {sidebarOpen && (
           <motion.div
-            className="fixed top-0 right-0 h-full w-64 bg-white shadow-xl z-50 p-6"
+            className="fixed top-0 right-0 h-full w-64 bg-white shadow-xl z-50 p-6 money-box"
             initial={{ x: 300 }}
             animate={{ x: 0 }}
             exit={{ x: 300 }}
@@ -165,7 +165,7 @@ export default function DashboardPage() {
             >
               ✕ Close
             </button>
-            <div className="space-y-4 text-gray-700">
+            <div className="space-y-4">
               <Link href="/buy-airtime" className="block hover:underline">
                 📱 Buy Airtime
               </Link>
@@ -187,7 +187,7 @@ export default function DashboardPage() {
 function ActionBox({ title }: { title: string }) {
   return (
     <motion.div
-      className="w-full h-24 bg-white rounded-xl shadow flex items-center justify-center text-center font-semibold hover:bg-gray-50 transition border cursor-pointer"
+      className="w-full h-24 bg-white rounded-xl shadow flex items-center justify-center text-center font-semibold hover:bg-gray-50 transition border cursor-pointer money-box"
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       initial={{ opacity: 0, y: 20 }}

@@ -27,9 +27,9 @@ export default function LoginPage() {
       return setError('Phone must be exactly 10 digits')
     }
 
-    if (form.password.length < 3) {
+    if (form.password.length <= 3) {
       setLoading(false)
-      return setError('Password cannot be less than 3')
+      return setError('Password is weak')
     }
 
     try {
@@ -66,10 +66,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+    <div className="min-h-screen flex items-center justify-center px-4">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-xl shadow-md w-full max-w-md space-y-4"
+        className="login-box p-8 rounded-xl shadow-md w-full max-w-md space-y-4"
       >
         <h2 className="text-2xl font-bold text-center">Login</h2>
 
@@ -104,7 +104,7 @@ export default function LoginPage() {
         >
           {loading ? 'Logging in...' : 'Login'}
         </button>
-        <p style={{textAlign:"center"}}>Don&apos;t have an account...? <Link style={{color:"blue", textDecoration:"underline"}} href={"/signup"}>Signup</Link></p>
+        <p style={{textAlign:"center"}}>Don&apos;t have an account...? <Link style={{color:"white", textDecoration:"underline"}} href={"/signup"}>Create Account</Link></p>
       </form>
     </div>
   )

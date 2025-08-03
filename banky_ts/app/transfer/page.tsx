@@ -39,10 +39,10 @@ export default function TransferPage() {
   }
 
   return (
-    <div className="min-h-screen p-4 flex flex-col justify-center items-center bg-gray-50">
+    <div className="min-h-screen p-4 flex flex-col justify-center items-center">
       <form
         onSubmit={handleSubmit}
-        className="bg-white shadow-lg rounded-xl p-6 w-full max-w-md"
+        className="money-box shadow-lg rounded-xl p-6 w-full max-w-md"
       >
         <h2 className="text-xl font-bold mb-4 text-center">Transfer Money</h2>
         <input
@@ -64,7 +64,7 @@ export default function TransferPage() {
         />
         <button
           type="submit"
-          className="bg-blue-600 text-white py-2 rounded w-full hover:bg-blue-700"
+          className="bg-black text-white py-2 rounded w-full"
           disabled={loading}
         >
           {loading ? 'Sending...' : 'Send Money'}

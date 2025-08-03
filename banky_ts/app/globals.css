@@ -3,3 +3,50 @@
 @tailwind components;
 @tailwind utilities;
 
+body{
+    background-color: hsl(0, 0%, 4%);
+    color: white;
+}
+
+#login{
+    color: white;
+    border: none;
+    background-color: hsl(0, 0%, 1%);
+    filter: drop-shadow(5px 5px 5px black);
+}
+#login:hover{
+    border: none;
+    background-color: hsl(0, 0%, 2%);
+}
+
+.login-box{
+    color: white;
+    background-color: black;
+    filter: drop-shadow(2px 2px 2px grey);
+}
+
+.login-box button{
+    background-color: hsl(0, 0%, 15%);
+    color: white;
+}
+
+.signup-box{
+    color: white;
+    background-color: black;
+    filter: drop-shadow(2px 2px 2px grey);
+}
+
+.signup-box button{
+    background-color: hsl(0, 0%, 15%);
+    color: white;
+}
+
+.money-box{
+    background-color: hsl(0, 0%, 15%);
+    filter: drop-shadow(2px 2px 2px rgb(94, 91, 91));
+}
+
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{
+    -webkit-appearance: none;
+    margin: 0;
+}

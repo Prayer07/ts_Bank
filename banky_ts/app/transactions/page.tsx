@@ -30,11 +30,11 @@ export default function TransactionsPage() {
   }, [])
 
   return (
-    <div className="min-h-screen p-6 bg-gray-100">
+    <div className="min-h-screen p-6">
       <h1 className="text-xl font-bold mb-4">Transaction History</h1>
       <ul className="space-y-3">
         {transactions.map((tx, i) => (
-  <div key={i} className="bg-white shadow p-4 rounded mb-4">
+  <div key={i} className="money-box shadow p-4 rounded mb-4">
     <p><strong>Type:</strong> {tx.type.toUpperCase()}</p>
     <p><strong>Amount:</strong> ₦{tx.amount.toLocaleString()}</p>
     {tx.to && <p><strong>To:</strong> {tx.to}</p>}

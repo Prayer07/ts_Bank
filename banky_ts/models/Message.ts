@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose'
+import mongoose, { Schema, model, models, Document } from 'mongoose'
 
 export interface IMessage extends Document {
   from: string
@@ -7,14 +7,17 @@ export interface IMessage extends Document {
   createdAt: Date
 }
 
-const messageSchema = new Schema<IMessage>(
+const MessageSchema = new Schema<IMessage>(
   {
     from: { type: String, required: true },
     to: { type: String, required: true },
     text: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
 )
 
-export default mongoose.models.Message || mongoose.model<IMessage>('Message', messageSchema)
+const MessageModel = models.Message || model<IMessage>('Message', MessageSchema)
+// const MessageModel =  mongoose.models.Message || mongoose.model('Message', messageSchema)
+
+export default MessageModel

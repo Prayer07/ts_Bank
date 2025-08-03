@@ -71,7 +71,7 @@ export default function AddMoneyButton({ userId, amount }: AddMoneyButtonProps) 
   return (
     <button
       onClick={handlePayment}
-      className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
+      className="bg-black text-white px-4 py-2 rounded disabled:opacity-50"
       disabled={!paystackReady}
     >
       {paystackReady ? 'Add Money' : 'Loading...'}

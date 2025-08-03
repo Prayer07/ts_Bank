@@ -16,7 +16,7 @@ export default function AddMoneyPage() {
   }, [userId])
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-4 shadow rounded bg-white">
+    <div className="max-w-md mx-auto mt-10 p-4 shadow rounded bg-white money-box">
       <h2 className="text-xl font-bold mb-4">Add Money</h2>
 
       <input

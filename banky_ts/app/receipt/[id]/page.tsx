@@ -68,12 +68,12 @@ export default function ReceiptPage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4"
-      style={{ backgroundColor: '#f3f4f6' }} // bg-gray-100
+      // style={{ backgroundColor: '#f3f4f6' }} // bg-gray-100
     >
       <motion.div
         id="receipt-content"
-        className="shadow-2xl rounded-xl p-6 w-full max-w-md"
-        style={{ backgroundColor: '#ffffff' }} // bg-white
+        className="shadow-2xl rounded-xl p-6 w-full max-w-md money-box"
+        // style={{ backgroundColor: '#ffffff' }} // bg-white
         initial={{ y: 30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -85,7 +85,7 @@ export default function ReceiptPage() {
           Payment Receipt
         </h2>
 
-        <div className="space-y-3" style={{ color: '#374151' }}> {/* text-gray-700 */}
+        <div className="space-y-3" style={{ color: 'white' }}> {/* text-gray-700 */}
           <p><strong>Transaction ID:</strong> {transaction._id}</p>
           <p><strong>Type:</strong> {transaction.type.toUpperCase()}</p>
           <p><strong>Amount:</strong> ₦{transaction.amount.toLocaleString()}</p>
