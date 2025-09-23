@@ -3,13 +3,23 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { signIn, useSession } from 'next-auth/react'
+import toast from 'react-hot-toast'
+import { FcGoogle } from 'react-icons/fc'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function LoginPage() {
   const router = useRouter()
 
-  const [form, setForm] = useState({ phone: '', password: '' })
+  const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const { data } = useSession()
+  const session = data
+  console.log(session)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -20,14 +30,7 @@ export default function LoginPage() {
     setError('')
     setLoading(true)
 
-    const phoneRegex = /^\d{10}$/
-
-    if (!phoneRegex.test(form.phone)) {
-      setLoading(false)
-      return setError('Phone must be exactly 10 digits')
-    }
-
-    if (form.password.length <= 3) {
+    if (form.password.length < 6) {
       setLoading(false)
       return setError('Password is weak')
     }
@@ -45,19 +48,18 @@ export default function LoginPage() {
         throw new Error(data.error || 'Login failed')
       }
 
-      // Save token and fname to sessionStorage
       sessionStorage.setItem('token', data.token)
       sessionStorage.setItem('user', JSON.stringify(data.user))
-      sessionStorage.setItem('phone', data.phone)
+      sessionStorage.setItem('email', data.email)
 
       setTimeout(() => {
         router.push('/dashboard')
       })
 
     } catch (err: unknown) {
-      if(err instanceof Error){
+      if (err instanceof Error) {
         setError(err.message)
-      }else{
+      } else {
         setError('An unexpected error occurred')
       }
     } finally {
@@ -66,46 +68,68 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="login-box p-8 rounded-xl shadow-md w-full max-w-md space-y-4"
-      >
-        <h2 className="text-2xl font-bold text-center">Login</h2>
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <Card className="w-full max-w-md shadow-xl border border-gray-800 bg-card">
+        <CardHeader>
+          <CardTitle className="text-center text-2xl font-bold text-foreground">
+            Login
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              name="email"
+              type="email"
+              placeholder="Email Address"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
 
-        <input
-          name="phone"
-          type="tel"
-          placeholder="Phone (10 digits)"
-          value={form.phone}
-          onChange={handleChange}
-          required
-          pattern="\d{10}"
-          maxLength={10}
-          className="w-full border p-2 rounded"
-        />
+            <Input
+              name="password"
+              type="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
 
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-          required
-          className="w-full border p-2 rounded"
-        />
+            {error && <p className="text-red-500 text-sm">{error}</p>}
 
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-xl"
+            >
+              {loading ? 'Logging in...' : 'Login'}
+            </Button>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-black text-white py-2 rounded hover:opacity-90"
-        >
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-        <p style={{textAlign:"center"}}>Don&apos;t have an account...? <Link style={{color:"white", textDecoration:"underline"}} href={"/signup"}>Create Account</Link></p>
-      </form>
+            <p className="text-sm text-center text-muted-foreground">
+              Don&apos;t have an account?{" "}
+              <Link href="/signup" className="text-yellow-400 underline">
+                Create Account
+              </Link>
+            </p>
+
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-px bg-gray-700" />
+              <span className="text-muted-foreground text-sm">OR</span>
+              <div className="flex-1 h-px bg-gray-700" />
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => signIn("google", { redirectTo: "/dashboard" })}
+              className="w-full flex items-center justify-center gap-2 rounded-xl"
+            >
+              <FcGoogle size={22} />
+              <span>Continue with Google</span>
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   )
 }

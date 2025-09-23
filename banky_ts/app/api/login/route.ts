@@ -10,15 +10,15 @@ console.log("login "+ JWT_SECRET)
 export async function POST(req: Request) {
     try {
         await connectDB()
-        const {phone, password} = await req.json()
+        const { email, password} = await req.json()
 
-        if(!phone || !password){
-            return NextResponse.json({error: "Missing phone or password"}, {status: 400})
+        if(!email || !password){
+            return NextResponse.json({error: "Missing email or password"}, {status: 400})
         }
 
-        const user = await Users.findOne({phone})
+        const user = await Users.findOne({ email })
         if(!user) {
-            return NextResponse.json({error: "User not found"}, {status: 404})
+            return NextResponse.json({error: "Email not found"}, {status: 404})
         }
 
         const isMatch = await bcrypt.compare(password, user.password)
@@ -29,8 +29,8 @@ export async function POST(req: Request) {
         const token = jwt.sign(
             {
                 _id: user._id,
-                fname: user.fname,
-                phone: user.phone,
+                fullname: user.fullname,
+                email : user.email,
             },
             JWT_SECRET,
             {expiresIn: '1d'}
@@ -40,8 +40,8 @@ export async function POST(req: Request) {
         token,
         user: {
             _id: user._id,
-            phone: user.phone,
-            fname: user.fname,
+            email: user.email,
+            fullname: user.fullname,
             balance: user.balance,
         }}, {status: 200})
 

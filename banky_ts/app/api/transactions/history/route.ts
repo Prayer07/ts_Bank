@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import jwt from 'jsonwebtoken'
-import { connectDB } from "../../../lib/db";
-import User from "../../../models/Users";
+import { connectDB } from "../../../../lib/db";
+import Users from "../../../../models/Users";
 
 const JWT_SECRET = process.env.JWT_SECRET!
 console.log("Transactions " + JWT_SECRET )
@@ -15,8 +15,8 @@ export async function GET(req: NextRequest){
 
     interface DecodedToken {
         _id: string
-        fname: string
-        phone: string
+        fullname: string
+        email: string
         exp: number
     }
 
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest){
         
         const decoded = jwt.verify(token, JWT_SECRET ) as DecodedToken
 
-        const user = await User.findById(decoded._id)
+        const user = await Users.findById(decoded._id)
         if(!user){
             return NextResponse.json({error: "User not found"}, {status: 404})
         }
@@ -41,5 +41,4 @@ export async function GET(req: NextRequest){
         }
         return NextResponse.json({ error: "Something went wrong" }, { status: 500 })
     }
-
 }

@@ -6,15 +6,10 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request){
     try {
         await connectDB()
-        const{fname, lname, phone, password} = await req.json()
+        const{fullname, email, password} = await req.json()
 
         //Validation
-        const phoneRegex = /^\d{10}$/
-        if (!phoneRegex.test(phone)){
-            return NextResponse.json({error: "Phone number must be 10 digits"}, {status: 400})
-        }
-
-        const existingUser = await Users.findOne({phone})
+        const existingUser = await Users.findOne({email})
         if(existingUser){
             return NextResponse.json({error: "User already exists"}, {status: 400})
         }
@@ -23,9 +18,8 @@ export async function POST(req: Request){
         const hashedPassword = await bcrypt.hash(password, salt)
 
         const newUser = new Users({
-            fname,
-            lname,
-            phone,
+            fullname,
+            email,
             password: hashedPassword,
         })
 

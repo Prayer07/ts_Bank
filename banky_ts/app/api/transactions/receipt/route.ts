@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
-import { connectDB } from "../../../lib/db"
-import User from "../../../models/Users"
+import { connectDB } from "../../../../lib/db"
+import Users from "../../../../models/Users"
 
 export async function GET(req: Request){
     const {searchParams} = new URL(req.url)
@@ -13,7 +13,7 @@ export async function GET(req: Request){
     try {
         await connectDB()
 
-        const user = await User.findOne({'transactions._id': id})
+        const user = await Users.findOne({'transactions._id': id})
 
         if (!user){
             return NextResponse.json({error: "Transaction not found"}, {status: 404})

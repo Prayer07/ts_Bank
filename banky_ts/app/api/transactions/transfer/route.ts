@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from 'jsonwebtoken'
-import { connectDB } from "../../../lib/db";
-import User from "../../../models/Users";
+import { connectDB } from "../../../../lib/db";
+import Users from "../../../../models/Users";
 
 const JWT_SECRET = process.env.JWT_SECRET!
 console.log("Transfer " + JWT_SECRET )
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest){
     interface DecodedToken {
         _id: string
         fname: string
-        phone: string
+        email: string
         exp: number
     }
 
@@ -26,16 +26,16 @@ export async function POST(req: NextRequest){
     try {
         
         const decoded = jwt.verify(token, JWT_SECRET ) as DecodedToken
-        const {phone, amount} = await req.json()
+        const {email, amount} = await req.json()
 
-        const sender = await User.findById(decoded._id)
+        const sender = await Users.findById(decoded._id)
         if(!sender) return NextResponse.json({error: "Sender not found"}, {status: 404})
         
-        if (phone === sender.phone){
+        if (email === sender.email){
             return NextResponse.json({error:"Thef Cannot send to yourself"}, {status: 400})
         }
 
-        const receiver = await User.findOne({phone})
+        const receiver = await Users.findOne({email})
         if(!receiver)
             return NextResponse.json({error: "User not found"}, {status: 404})
 
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest){
         const newTx = {
         type: 'transfer',
         amount: amt,
-        to: phone,
+        to: email,
         }
 
         sender.transactions.push(newTx)
@@ -61,14 +61,14 @@ export async function POST(req: NextRequest){
         sender.transactions.push({
         type: 'transfer',
         amount: amt,
-        to: phone,
-        from: sender.phone,
+        to: email,
+        from: sender.email,
         })
 
         receiver.transactions.push({
         type: 'receive',
         amount: amt,
-        from: sender.phone,
+        from: sender.email,
         })
 
         await sender.save()

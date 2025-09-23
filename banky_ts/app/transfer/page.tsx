@@ -1,76 +1,57 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import toast from 'react-hot-toast'
+import React, { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
+import { jwtDecode } from 'jwt-decode'
+import NormalUserTransfer from '../../components/NormalUserTransfer'
+import GoogleTransfer from '../../components/GoogleTransfer'
 
-export default function TransferPage() {
-  const router = useRouter()
-  const [phone, setPhone] = useState('')
-  const [amount, setAmount] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('')
+interface DecodedToken {
+    _id: string
+    fullname: string
+    email: string
+    exp: number
+}
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
 
-    const token = sessionStorage.getItem('token')
-    if (!token) return router.push('/login')
+function page() {
+    const {data: session, status} = useSession()
+    const [isNormalUser, setIsNormalUser] = useState(false)
 
-    const res = await fetch('/api/transfer', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ phone, amount }),
+    useEffect(() => {
+        const token = sessionStorage.getItem("token")
+        if (token){
+            try {
+                const decoded: DecodedToken = jwtDecode(token)
+                if (decoded.exp * 1000 > Date.now()){
+                    setIsNormalUser(true)
+                }else{
+                    sessionStorage.removeItem("token")
+                    setIsNormalUser(false)
+                }
+            }catch (err: unknown) {
+                if(err instanceof Error){
+                    console.error("Invalid token", err)
+                    setIsNormalUser(false)
+                }else{
+                    console.error("Something went wrong")
+                }
+            }
+        }
     })
 
-    const data = await res.json()
-    setLoading(false)
-
-    if (!res.ok) {
-      setMessage(data.error || 'Transfer failed')
-    } else {
-      toast.success('Transfer successful! Redirecting to receipt...')
-      setTimeout(() =>   router.push(`/receipt/${data.receiptId}`), 1500)
+    if (isNormalUser) {
+        return <NormalUserTransfer/>
     }
-  }
 
-  return (
-    <div className="min-h-screen p-4 flex flex-col justify-center items-center">
-      <form
-        onSubmit={handleSubmit}
-        className="money-box shadow-lg rounded-xl p-6 w-full max-w-md"
-      >
-        <h2 className="text-xl font-bold mb-4 text-center">Transfer Money</h2>
-        <input
-          type="tel"
-          placeholder="Recipient Phone Number"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          required
-          maxLength={11}
-          className="w-full p-3 border rounded mb-4"
-        />
-        <input
-          type="number"
-          placeholder="Amount"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          required
-          className="w-full p-3 border rounded mb-4"
-        />
-        <button
-          type="submit"
-          className="bg-black text-white py-2 rounded w-full"
-          disabled={loading}
-        >
-          {loading ? 'Sending...' : 'Send Money'}
-        </button>
-        {message && <p className="text-center mt-4 text-sm">{message}</p>}
-      </form>
-    </div>
-  )
+    if (status === "loading") return
+            <div className="flex items-center justify-center min-h-screen text-gray-600">
+                Loading...
+            </div>
+
+    if (session) {
+        return <GoogleTransfer/>
+    }
 }
+
+export default page

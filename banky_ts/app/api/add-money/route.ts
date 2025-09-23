@@ -11,8 +11,8 @@ export async function POST(req: NextRequest){
 
     interface DecodedToken {
         _id: string
-        fname: string
-        phone: string
+        fullname: string
+        email: string
         exp: number
     }
 
@@ -40,10 +40,6 @@ export async function POST(req: NextRequest){
 
         user.balance += amt
 
-        // if (!user.transactions) {
-        // user.transactions = []
-        // }
-
         user.transactions.push({
         type: 'add',
         amount: amt,
@@ -51,7 +47,11 @@ export async function POST(req: NextRequest){
 
         await user.save()
 
-        return NextResponse.json({message: "Money added", balance: user.balance})
+        return NextResponse.json({
+            success: true,
+            message: "Money added",
+            balance: user.balance
+        })
 
     } catch (err: unknown) {
         if (err instanceof Error) {

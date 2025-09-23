@@ -7,15 +7,15 @@ export async function GET(req: Request) {
         await connectDB()
 
         const url = new URL(req.url)
-        const phone = url.searchParams.get('phone')
+        const email = url.searchParams.get('email')
 
-        if(!phone){
-            return NextResponse.json({error: "Phone is required"}, {status: 400})
+        if(!email){
+            return NextResponse.json({error: "Email is required"}, {status: 400})
         }
 
-        const user = await Users.findOne({phone}).select('fname phone balance')
+        const user = await Users.findOne({ email }).select('fullname email balance')
         if (!user){
-            return NextResponse.json({error: "User not found"}, {status: 404})
+            return NextResponse.json({error: "Email not found"}, {status: 404})
         }
 
         return NextResponse.json({user}, {status: 200})

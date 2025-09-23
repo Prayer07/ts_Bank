@@ -3,14 +3,18 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { signIn } from 'next-auth/react'
+import { FcGoogle } from "react-icons/fc"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function SignupPage() {
   const router = useRouter()
 
   const [form, setForm] = useState({
-    fname: '',
-    lname: '',
-    phone: '',
+    fullname: '',
+    email: '',
     password: ''
   })
 
@@ -26,14 +30,7 @@ export default function SignupPage() {
     setError('')
     setLoading(true)
 
-    const phoneRegex = /^\d{10}$/
-
-    if (!phoneRegex.test(form.phone)) {
-      setLoading(false)
-      return setError('Phone must be exactly 10 digits')
-    }
-
-    if (form.password.length <= 3) {
+    if (form.password.length < 6) {
       setLoading(false)
       return setError('Password is weak')
     }
@@ -55,9 +52,9 @@ export default function SignupPage() {
       }, 1500)
 
     } catch (err: unknown) {
-      if(err instanceof Error){
+      if (err instanceof Error) {
         setError(err.message)
-      }else{
+      } else {
         setError('An unexpected error occurred')
       }
     } finally {
@@ -66,67 +63,77 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="p-8 rounded-xl shadow-md w-full max-w-md space-y-4 signup-box"
-      >
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <Card className="w-full max-w-md shadow-xl border border-gray-800 bg-card">
+        <CardHeader>
+          <CardTitle className="text-center text-2xl font-bold text-foreground">
+            Create Account
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              name="fullname"
+              type="text"
+              placeholder="Full Name"
+              value={form.fullname}
+              onChange={handleChange}
+              required
+            />
 
-        <h2 className="text-2xl font-bold text-center">Create Account</h2>
+            <Input
+              name="email"
+              type="email"
+              placeholder="Email Address"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
 
-        <input
-          name="fname"
-          type="text"
-          placeholder="First Name"
-          value={form.fname}
-          onChange={handleChange}
-          required
-          className="w-full border p-2 rounded"
-        />
+            <Input
+              name="password"
+              type="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
 
-        <input
-          name="lname"
-          type="text"
-          placeholder="Last Name"
-          value={form.lname}
-          onChange={handleChange}
-          required
-          className="w-full border p-2 rounded"
-        />
+            {error && <p className="text-red-500 text-sm">{error}</p>}
 
-        <input
-          name="phone"
-          type="tel"
-          placeholder="Phone (10 digits)"
-          value={form.phone}
-          onChange={handleChange}
-          required
-          pattern="\d{10}"
-          maxLength={10}
-          className="w-full border p-2 rounded"
-        />
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-xl"
+            >
+              {loading ? 'Creating Account...' : 'Create Account'}
+            </Button>
 
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-          required
-          className="w-full border p-2 rounded"
-        />
+            <p className="text-sm text-center text-muted-foreground">
+              Already have an account?{" "}
+              <Link href="/login" className="text-yellow-400 underline">
+                Login
+              </Link>
+            </p>
 
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-px bg-gray-700" />
+              <span className="text-muted-foreground text-sm">OR</span>
+              <div className="flex-1 h-px bg-gray-700" />
+            </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-black text-white py-2 rounded hover:opacity-90"
-        >
-          {loading ? 'Creating Account...' : 'Create Account'}
-        </button>
-        <p style={{textAlign:"center"}}>Already have an account...? <Link style={{color:"white", textDecoration:"underline"}} href={"/login"}>Login</Link></p>
-      </form>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => signIn("google", { redirectTo: "/dashboard" })}
+              className="w-full flex items-center justify-center gap-2 rounded-xl"
+            >
+              <FcGoogle size={22} />
+              <span>Continue with Google</span>
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   )
 }

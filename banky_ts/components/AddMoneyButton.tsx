@@ -1,21 +1,23 @@
-'use client'
+"use client"
 
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import toast from "react-hot-toast"
 
 type AddMoneyButtonProps = {
   userId: string
-  amount: string
+  amount: number
+  email?: string
 }
 
-export default function AddMoneyButton({ userId, amount }: AddMoneyButtonProps) {
+export default function AddMoneyButton({ userId, amount, email }: AddMoneyButtonProps) {
   const [paystackReady, setPaystackReady] = useState(false)
   const router = useRouter()
   const ref = Math.floor(Math.random() * 1000000000).toString()
 
   useEffect(() => {
-    const script = document.createElement('script')
-    script.src = 'https://js.paystack.co/v1/inline.js'
+    const script = document.createElement("script")
+    script.src = "https://js.paystack.co/v1/inline.js"
     script.async = true
     script.onload = () => setPaystackReady(true)
     document.body.appendChild(script)
@@ -23,24 +25,28 @@ export default function AddMoneyButton({ userId, amount }: AddMoneyButtonProps) 
 
   const handlePayment = () => {
     if (!userId || !amount) {
-      alert('Missing user ID or amount')
+      toast.error("Missing user ID or amount")
       return
     }
 
     if (!paystackReady || !window.PaystackPop) {
-      alert('Paystack is not ready yet. Please try again shortly.')
+      toast.error("Paystack is not ready yet. Please try again shortly.")
       return
     }
 
     const paystack = window.PaystackPop.setup({
-      key: 'pk_test_03924c92898057e131556cf7d8c1a47c11a68395', // 🔑 Replace with your real Paystack Public Key
-      amount: parseInt(amount) * 100,
-      email: 'test@example.com', // Still required by Paystack, even if dummy
+      key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!,
+      amount: amount * 100, // Paystack uses kobo
+      email: email || "test@gmail.com",
       ref,
       callback: function (response) {
-        fetch('/api/verify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const token = sessionStorage.getItem("token")
+        fetch("/api/transactions/verify", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
             ref: response.reference,
             userId,
@@ -50,18 +56,18 @@ export default function AddMoneyButton({ userId, amount }: AddMoneyButtonProps) 
           .then((res) => res.json())
           .then((data) => {
             if (data.success) {
-              alert('Wallet funded successfully!')
-              setTimeout(() =>{
-                router.push("dashboard")
-              }, 1500)
+              toast.success("Wallet funded successfully!")
+              setTimeout(() => {
+                router.push(`/receipt/${data.receiptId}`)
+              }, 1000)
             } else {
-              alert(data.error || 'Verification failed')
+              toast.error(data.error || "Verification failed")
             }
           })
-          .catch(() => alert('Error verifying payment'))
+          .catch(() => toast.error("Error verifying payment"))
       },
       onClose: () => {
-        alert('Payment window closed.')
+        toast.error("Payment window closed.")
       },
     })
 
@@ -71,10 +77,97 @@ export default function AddMoneyButton({ userId, amount }: AddMoneyButtonProps) 
   return (
     <button
       onClick={handlePayment}
-      className="bg-black text-white px-4 py-2 rounded disabled:opacity-50"
-      disabled={!paystackReady}
+      className="bg-black text-white py-2 rounded w-full"
+      disabled={!paystackReady || amount <= 0}
     >
-      {paystackReady ? 'Add Money' : 'Loading...'}
+      {paystackReady ? "Add Money" : "Loading..."}
     </button>
   )
 }
+
+
+
+
+
+// "use client"
+
+// import { useRouter } from "next/navigation"
+// import { useEffect, useState } from "react"
+// import toast from "react-hot-toast"
+
+// type AddMoneyButtonProps = {
+//   userId: string
+//   amount: number
+//   email?: string // add email so Paystack can use it
+// }
+
+// export default function AddMoneyButton({ userId, amount, email }: AddMoneyButtonProps) {
+//   const [paystackReady, setPaystackReady] = useState(false)
+//   const router = useRouter()
+//   const ref = Math.floor(Math.random() * 1000000000).toString()
+
+//   useEffect(() => {
+//     const script = document.createElement("script")
+//     script.src = "https://js.paystack.co/v1/inline.js"
+//     script.async = true
+//     script.onload = () => setPaystackReady(true)
+//     document.body.appendChild(script)
+//   }, [])
+
+//   const handlePayment = () => {
+//     if (!userId || !amount) {
+//       toast.error("Missing user ID or amount")
+//       return
+//     }
+
+//     if (!paystackReady || !window.PaystackPop) {
+//       toast.error("Paystack is not ready yet. Please try again shortly.")
+//       return
+//     }
+
+//     const paystack = window.PaystackPop.setup({
+//       key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!, // Replace with real public key
+//       amount: amount * 100, // Paystack uses kobo
+//       email: email || "test@gmail.com",
+//       ref,
+//       callback: function (response) {
+//         fetch("/api/transactions/verify", {
+//           method: "POST",
+//           headers: { "Content-Type": "application/json" },
+//           body: JSON.stringify({
+//             ref: response.reference,
+//             userId,
+//             amount,
+//           }),
+//         })
+//           .then((res) => res.json())
+//           .then((data) => {
+//             if (data.success) {
+//               toast.success("Wallet funded successfully!")
+//               setTimeout(() => {
+//                 router.push("/dashboard")
+//               }, 1000)
+//             } else {
+//               toast.error(data.error || "Verification failed")
+//             }
+//           })
+//           .catch(() => alert("Error verifying payment"))
+//       },
+//       onClose: () => {
+//         toast.error("Payment window closed.")
+//       },
+//     })
+
+//     paystack.openIframe()
+//   }
+
+//   return (
+//     <button
+//       onClick={handlePayment}
+//       className="bg-black text-white py-2 rounded w-full"
+//       disabled={!paystackReady || amount <= 0}
+//     >
+//       {paystackReady ? "Add Money" : "Loading..."}
+//     </button>
+//   )
+// }

@@ -29,3 +29,27 @@ bankchat-app/
 ├── next.config.js
 ├── tsconfig.json
 └── package.json
+
+
+
+/app
+  /chat
+    /[id]             → Chat page with selected user
+    page.tsx
+  /search
+    page.tsx          → Search user page
+
+/lib
+  db.ts               → MongoDB connection helper
+
+/models
+  user.ts             → User model
+  message.ts          → Message model
+
+/api
+  /search
+    route.ts          → Search user by name/ 
+  /chat-history
+    route.ts          → Fetch messages between two users
+  /send-message
+    route.ts          → Send a new message

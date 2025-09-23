@@ -1,44 +1,54 @@
 'use client'
-import { useRouter } from "next/navigation";
-// import "./globals.css"
+
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { motion } from "framer-motion"
+import "./globals.css";
 
 export default function HomePage() {
-  const router = useRouter();
+  const router = useRouter()
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <div className="max-w-3xl w-full text-center space-y-8">
+    <div className="min-h-screen bg-black text-gray-100 flex items-center justify-center p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="max-w-3xl w-full text-center space-y-8"
+      >
+        {/* Heading */}
         <h1 className="text-4xl sm:text-6xl font-extrabold leading-tight">
-          Welcome to <span className="text-yellow-400">Banky</span>
+          Welcome to{" "}
+          <span className="text-yellow-400 drop-shadow-lg">Banky</span>
         </h1>
-        <p className="text-lg sm:text-xl text-white-200 max-w-xl mx-auto">
+
+        {/* Subtext */}
+        <p className="text-lg sm:text-xl text-gray-400 max-w-xl mx-auto">
           Send money, chat, and connect — all in one secure and fast app.
         </p>
 
+        {/* Buttons */}
         <div className="flex flex-col sm:flex-row justify-center gap-4 mt-6">
-          <button
+          <Button
             onClick={() => router.push("/signup")}
-            className="px-6 py-3 bg-yellow-400 hover:bg-yellow-300 text-black font-semibold rounded-full shadow-xl"
+            className="px-8 py-3 text-lg font-semibold rounded-2xl 
+                      bg-yellow-400 hover:bg-yellow-300 text-black 
+                      shadow-lg transition-transform hover:scale-105"
           >
             Signup
-          </button>
-          <button
+          </Button>
+
+          <Button
             onClick={() => router.push("/login")}
-            className="px-6 py-3 border bg-black font-semibold rounded-full" id="login"
-            // hover:bg-black hover:text-white transition 
+            variant="outline"
+            className="px-8 py-3 text-lg font-semibold rounded-2xl 
+                      border border-gray-700 bg-zinc-900 text-gray-200 
+                      hover:bg-zinc-800 hover:text-white transition"
           >
             Login
-          </button>
+          </Button>
         </div>
-
-        {/* <div className="mt-12">
-          <img
-            src="/bank-illustration.svg"
-            alt="Bank App Illustration"
-            className="w-full max-w-md mx-auto"
-          />
-        </div> */}
-      </div>
+      </motion.div>
     </div>
-  );
+  )
 }
