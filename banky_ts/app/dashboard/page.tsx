@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react'
 import NormalUsers from '../../components/NormalUsers'
 import { jwtDecode } from 'jwt-decode'
 import { motion } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 
 interface DecodedToken {
     _id: string
@@ -14,54 +15,57 @@ interface DecodedToken {
     exp: number
 }
 
-
 function Page() {
-    const {data: session, status} = useSession()
+    const { data: session, status } = useSession()
     const [isNormalUser, setIsNormalUser] = useState(false)
+    const router = useRouter()
 
     useEffect(() => {
-        const token = sessionStorage.getItem("token")
-        if (token){
-            try {
-                const decoded: DecodedToken = jwtDecode(token)
-                if (decoded.exp * 1000 > Date.now()){
-                    setIsNormalUser(true)
-                }else{
-                    sessionStorage.removeItem("token")
-                    setIsNormalUser(false)
-                }
-            }catch (err: unknown) {
-                if(err instanceof Error){
-                    console.error("Invalid token", err)
-                    setIsNormalUser(false)
-                }else{
-                    console.error("Something went wrong")
-                }
+        const token = sessionStorage.getItem('token')
+
+        if (token) {
+        try {
+            const decoded: DecodedToken = jwtDecode(token)
+            if (decoded.exp * 1000 > Date.now()) {
+            setIsNormalUser(true)
+            return
+            } else {
+            sessionStorage.removeItem('token')
             }
+        } catch (err) {
+            console.error('Invalid token', err)
         }
-    }, [isNormalUser])
+        }
 
-    if (isNormalUser) {
-        return <NormalUsers/>
-    }
+        // 🔹 Only check Google session if no valid normal-user token
+        if (status === 'unauthenticated') {
+        router.push('/login')
+        }
+    }, [status, router])
 
-    if (status === "loading"){
+    if (status === 'loading') {
         return (
-            <div className="min-h-screen flex items-center justify-center p-4">
-                <motion.div 
-                    className="text-center"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                >
+        <div className="min-h-screen flex items-center justify-center p-4">
+            <motion.div
+            className="text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            >
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mb-4"></div>
-                </motion.div>
-            </div>
+            </motion.div>
+        </div>
         )
     }
 
-    if (session) {
-        return <GoogleUsers/>
+    if (isNormalUser) {
+        return <NormalUsers />
     }
+
+    if (session) {
+        return <GoogleUsers />
+    }
+
+    return null
 }
 
 export default Page

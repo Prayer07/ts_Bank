@@ -9,6 +9,7 @@ import { FcGoogle } from 'react-icons/fc'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import PasswordInput from '../../components/PasswordInput'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -52,7 +53,7 @@ export default function LoginPage() {
       sessionStorage.setItem('user', JSON.stringify(data.user))
       sessionStorage.setItem('email', data.email)
 
-      toast.success("Logged in successfully")
+      toast.success("Login successfully")
 
       setTimeout(() => {
         router.push('/dashboard')
@@ -86,14 +87,14 @@ export default function LoginPage() {
               value={form.email}
               onChange={handleChange}
               required
+              className="w-full rounded-md border border-input bg-background px-3 py-2 pr-10 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             />
 
-            <Input
+            <PasswordInput
               name="password"
-              type="password"
-              placeholder="Password"
               value={form.password}
               onChange={handleChange}
+              placeholder="Password"
               required
             />
 
