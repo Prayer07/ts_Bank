@@ -35,9 +35,6 @@ export default function NormalUsers() {
         const token = sessionStorage.getItem('token')
         if (!token) return router.push('/login')
 
-        const stored = sessionStorage.getItem('user')
-        const user = stored ? JSON.parse(stored) : null
-
         try {
         const decoded: DecodedToken = jwtDecode(token)
         if (decoded.exp * 1000 < Date.now()) {

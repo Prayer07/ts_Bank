@@ -8,6 +8,7 @@ import { FcGoogle } from "react-icons/fc"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import toast from 'react-hot-toast'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -47,6 +48,8 @@ export default function SignupPage() {
       if (!res.ok) {
         throw new Error(data.error || 'Something went wrong')
       }
+      
+      toast.success("Logged in successfully")
       setTimeout(() => {
         router.push('/login')
       }, 1500)

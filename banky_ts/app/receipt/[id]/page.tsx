@@ -32,15 +32,15 @@ export default function ReceiptPage() {
     // Memoized formatted values
     const formattedAmount = useMemo(() => {
         return transaction ? `₦${transaction.amount.toLocaleString()}` : ''
-    }, [transaction?.amount])
+    }, [transaction])
 
     const formattedDate = useMemo(() => {
         return transaction ? new Date(transaction.date).toLocaleString() : ''
-    }, [transaction?.date])
+    }, [transaction])
 
     const formattedType = useMemo(() => {
         return transaction ? transaction.type.toUpperCase() : ''
-    }, [transaction?.type])
+    }, [transaction])
 
     useEffect(() => {
         if (!id) {

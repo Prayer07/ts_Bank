@@ -15,7 +15,7 @@ interface DecodedToken {
 }
 
 
-function page() {
+function Page() {
     const {data: session, status} = useSession()
     const [isNormalUser, setIsNormalUser] = useState(false)
 
@@ -64,4 +64,4 @@ function page() {
     }
 }
 
-export default page
+export default Page

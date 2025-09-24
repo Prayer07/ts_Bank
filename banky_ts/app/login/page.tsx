@@ -52,6 +52,8 @@ export default function LoginPage() {
       sessionStorage.setItem('user', JSON.stringify(data.user))
       sessionStorage.setItem('email', data.email)
 
+      toast.success("Logged in successfully")
+
       setTimeout(() => {
         router.push('/dashboard')
       })

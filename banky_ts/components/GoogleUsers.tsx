@@ -35,8 +35,12 @@ function GoogleUsers() {
         } else {
             router.push('/login')
         }
-        } catch (error) {
-        throw new Error('Something went wrong')
+        } catch (err) {
+            if (err instanceof Error) {
+                toast.error(err.message)
+            }else {
+                throw new Error('An unexpected error occurred')
+            }
         }
     }, [session])
 
