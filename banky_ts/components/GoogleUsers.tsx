@@ -42,7 +42,7 @@ function GoogleUsers() {
                 throw new Error('An unexpected error occurred')
             }
         }
-    }, [session])
+    }, [session, router])
 
     const handleSignOut = async () => {
         await signOut({ redirect: false })

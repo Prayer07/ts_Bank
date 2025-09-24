@@ -38,7 +38,7 @@ export default function AddMoneyButtonGoogle({ amount, email }: AddMoneyButtonPr
         amount: amount * 100, // Paystack uses kobo
         email, // ✅ Google user’s email goes straight to Paystack
         ref,
-        callback: function (response: any) {
+        callback: function (response) {
             fetch("/api/transactions/google/add-money", {
             method: "POST",
             headers: { "Content-Type": "application/json" },

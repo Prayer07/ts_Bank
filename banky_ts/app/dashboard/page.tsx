@@ -39,7 +39,7 @@ function Page() {
                 }
             }
         }
-    })
+    }, [isNormalUser])
 
     if (isNormalUser) {
         return <NormalUsers/>
