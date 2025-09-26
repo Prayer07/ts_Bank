@@ -52,7 +52,7 @@ export default function AddMoneyButtonGoogle({ amount, email }: AddMoneyButtonPr
                 if (data.success) {
                 toast.success("Wallet funded successfully!")
                 setTimeout(() => {
-                    router.push(`/receipt/${data.receiptId}`)
+                    router.push(`/dashboard`)
                 }, 1000)
                 } else {
                 toast.error(data.error || "Verification failed")
