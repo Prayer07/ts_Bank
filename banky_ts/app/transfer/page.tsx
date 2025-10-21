@@ -38,7 +38,7 @@ function Page() {
                 }
             }
         }
-    })
+    }, [isNormalUser, session])
 
     if (isNormalUser) {
         return <NormalUserTransfer/>
