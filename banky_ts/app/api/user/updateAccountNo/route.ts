@@ -1,19 +1,19 @@
-import { connectDB } from "../../../lib/db"
-import Users from "../../../models/Users"
+import { connectDB } from "../../../../lib/db";
+import Users from "../../../../models/Users";
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
 
 const JWT_SECRET = process.env.JWT_SECRET!
-console.log("login "+ JWT_SECRET)
+console.log("AccNo "+ JWT_SECRET)
 
 export async function POST(req: Request) {
     try {
         await connectDB()
-        const { email, password} = await req.json()
+        const { email, } = await req.json()
 
-        if(!email || !password){
-            return NextResponse.json({error: "Missing email or password"}, {status: 400})
+        if(!email){
+            return NextResponse.json({error: "Missing email"}, {status: 400})
         }
 
         const user = await Users.findOne({ email })
@@ -21,23 +21,12 @@ export async function POST(req: Request) {
             return NextResponse.json({error: "Email not found"}, {status: 404})
         }
 
-        const isMatch = await bcrypt.compare(password, user.password)
-        if(!isMatch) {
-            return NextResponse.json({error: "Invalid password"}, {status:401})
+        const accountNo = Math.floor(1000000000 + Math.random() * 9000000000);
+        if(!accountNo) {
+            return NextResponse.json({error: "Already owned"}, {status:401})
         }
 
-        const token = jwt.sign(
-            {
-                _id: user._id,
-                fullname: user.fullname,
-                email : user.email,
-            },
-            JWT_SECRET,
-            {expiresIn: '1d'}
-        )
-
         return NextResponse.json({
-        token,
         user: {
             _id: user._id,
             email: user.email,

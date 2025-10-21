@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 
 export default function NormalUserTransfer() {
     const router = useRouter();
-    const [email, setEmail] = useState("");
+    const [accountNo, setAccountNo] = useState("");
     const [amount, setAmount] = useState("");
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
@@ -26,7 +26,7 @@ export default function NormalUserTransfer() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ email, amount }),
+        body: JSON.stringify({ accountNo, amount }),
         });
 
         const data = await res.json();
@@ -51,10 +51,10 @@ export default function NormalUserTransfer() {
             </h2>
 
             <input
-            type="email"
-            placeholder="Recipient Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="tel"
+            placeholder="Recipient Account No"
+            value={accountNo}
+            onChange={(e) => setAccountNo(e.target.value)}
             required
             className="w-full p-3 rounded-xl bg-neutral-800 border border-neutral-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 mb-4"
             />

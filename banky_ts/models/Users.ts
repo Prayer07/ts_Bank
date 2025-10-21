@@ -13,6 +13,7 @@ export interface IUser extends Document {
     email: string
     password: string
     balance: number
+    accountNo: number
     transactions: ITransaction[]
 }
 
@@ -42,6 +43,10 @@ const UserSchema = new Schema<IUser>(
         trim: true,
         },
         balance: {
+        type: Number,
+        default: 0,
+        },
+        accountNo: {
         type: Number,
         default: 0,
         },

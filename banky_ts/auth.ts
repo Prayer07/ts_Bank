@@ -64,10 +64,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     email: profile?.email
                 })
 
+                const accountNo = Math.floor(1000000000 + Math.random() * 9000000000);
+
                 if(!existingUser){
                     const newUser = await Users.create({
                         fullname: profile?.name,
-                        email: profile?.email
+                        email: profile?.email,
+                        balance: 0,
+                        accountNo
                     })
 
                     user.id = newUser._id.toString()
@@ -83,11 +87,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
             let user = await Users.findOne({ email: session.user?.email})
 
+            const accountNo = Math.floor(1000000000 + Math.random() * 9000000000);
+            
             if(!user){
                 user = await Users.create({
                     email:session.user?.email,
                     fullname: session.user?.name,
                     balance: 0,
+                    accountNo,
                 })
             }
 

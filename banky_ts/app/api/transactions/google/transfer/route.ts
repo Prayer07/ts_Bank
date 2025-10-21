@@ -13,10 +13,10 @@
 
     await connectDB();
 
-    const { email, amount } = await req.json();
+    const { accountNo, email, amount } = await req.json();
     const senderId = session.user.id;
 
-    if (!email || !amount) {
+    if (!accountNo || !amount) {
         return NextResponse.json(
         { error: "Email and amount required" },
         { status: 400 }
@@ -25,13 +25,13 @@
 
     // Find sender & receiver
     const sender = await Users.findById(senderId);
-    const receiver = await Users.findOne({ email });
+    const receiver = await Users.findOne({ accountNo });
 
     if (!sender || !receiver) {
         return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    if (email === sender.email){
+    if (accountNo == sender.accountNo){
         return NextResponse.json({error: "Thef you cannot send money to yourself"}, {status: 400})
     }
 
@@ -59,7 +59,7 @@
     sender.transactions.push({
         type: 'transfer',
         amount: amt,
-        to: email,
+        to: receiver.email,
         from: sender.email,
     })
 

@@ -12,6 +12,7 @@ export interface UserData {
     fullname: string
     email: string
     balance: number
+    accountNo: number
 }
 
 const actions = [
@@ -48,6 +49,12 @@ function GoogleUsers() {
         await signOut({ redirect: false })
         router.push('/login')
         toast.success('Logged out successfully')
+    }
+
+    const copyToClipboard = () => {
+        const accountNo = user?.accountNo
+        navigator.clipboard.writeText((accountNo as number).toString())
+        toast.success("Account number copied!")
     }
 
     if (!session)
@@ -94,12 +101,16 @@ function GoogleUsers() {
             <div>
             <p className="text-sm text-muted-foreground">Balance</p>
             <div className="text-3xl font-bold text-green-500">
-                {user ? (
-                <AnimatedCounter key={user.balance} bal={user.balance} />
-                ) : (
-                <p>₦-</p>
-                )}
+                <AnimatedCounter bal={user? user.balance : 0} />
             </div>
+            <p className="text-sm text-muted-foreground">AccountNo: {" "}
+                <span 
+                className="cursor-pointer text-muted-foreground hover:text-green-600 transition"
+                onClick={copyToClipboard}
+            >
+                {user? user.accountNo : 0}
+            </span>
+            </p>
             </div>
             <Link
             href="/transactions"
@@ -147,6 +158,9 @@ function GoogleUsers() {
                 ✕ Close
                 </button>
                 <div className="space-y-4">
+                <Link href="/profile" className="block hover:underline">
+                    Profile
+                </Link>
                 <Link href="/buy-airtime" className="block hover:underline">
                     📱 Buy Airtime
                 </Link>

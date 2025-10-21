@@ -7,8 +7,9 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import AnimatedCounter from './AnimatedCounter'
 import Logout from './Logout'
+import toast from 'react-hot-toast'
 
-interface DecodedToken {
+export interface DecodedToken {
     _id: string
     fullname: string
     email: string
@@ -19,6 +20,7 @@ export interface UserData {
     fullname: string
     email: string
     balance: number
+    accountNo?: number
 }
 
 const actions = [
@@ -55,6 +57,12 @@ export default function NormalUsers() {
         router.push('/login')
         }
     }, [router])
+
+    const copyToClipboard = () => {
+        const accountNo = user?.accountNo
+        navigator.clipboard.writeText((accountNo as number).toString())
+        toast.success("Account number copied!")
+    }
 
     if (!user)
         return (
@@ -106,6 +114,14 @@ export default function NormalUsers() {
                     <p>₦-</p>
                 }
             </div>
+            <p className="text-sm text-muted-foreground">AccountNo: {" "}
+                <span 
+                className="cursor-pointer text-muted-foreground hover:text-green-600 transition"
+                onClick={copyToClipboard}
+            >
+                {user.accountNo}
+            </span>
+            </p>
             </div>
             <Link
             href="/transactions"
@@ -153,6 +169,9 @@ export default function NormalUsers() {
                 ✕ Close
                 </button>
                 <div className="space-y-4">
+                <Link href="/profile" className="block hover:underline">
+                    Profile
+                </Link>
                 <Link href="/buy-airtime" className="block hover:underline">
                     📱 Buy Airtime
                 </Link>

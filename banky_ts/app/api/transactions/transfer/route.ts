@@ -26,18 +26,20 @@ export async function POST(req: NextRequest){
     try {
         
         const decoded = jwt.verify(token, JWT_SECRET ) as DecodedToken
-        const {email, amount} = await req.json()
+        const {accountNo, email, amount} = await req.json()
 
         const sender = await Users.findById(decoded._id)
         if(!sender) return NextResponse.json({error: "Sender not found"}, {status: 404})
         
-        if (email === sender.email){
+        if (accountNo == sender.accountNo){
             return NextResponse.json({error:"Thef Cannot send to yourself"}, {status: 400})
         }
 
-        const receiver = await Users.findOne({email})
+        // console.log(accountNo)
+
+        const receiver = await Users.findOne({accountNo})
         if(!receiver)
-            return NextResponse.json({error: "User not found"}, {status: 404})
+            return NextResponse.json({error: "Account No not found"}, {status: 404})
 
         const amt = parseFloat(amount)
         if (isNaN(amt) || amt <= 0){
@@ -61,7 +63,7 @@ export async function POST(req: NextRequest){
         sender.transactions.push({
         type: 'transfer',
         amount: amt,
-        to: email,
+        to: receiver.email, // ✅ receiver email here
         from: sender.email,
         })
 

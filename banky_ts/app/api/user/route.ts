@@ -13,7 +13,7 @@ export async function GET(req: Request) {
             return NextResponse.json({error: "Email is required"}, {status: 400})
         }
 
-        const user = await Users.findOne({ email }).select('fullname email balance')
+        const user = await Users.findOne({ email }).select('fullname email balance accountNo')
         if (!user){
             return NextResponse.json({error: "Email not found"}, {status: 404})
         }

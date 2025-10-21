@@ -50,7 +50,7 @@ export default function SignupPage() {
         throw new Error(data.error || 'Something went wrong')
       }
       
-      toast.success("Logged in successfully")
+      toast.success("Signed up successfully")
       setTimeout(() => {
         router.push('/login')
       }, 1500)
