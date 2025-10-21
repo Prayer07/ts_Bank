@@ -169,9 +169,6 @@ export default function NormalUsers() {
                 ✕ Close
                 </button>
                 <div className="space-y-4">
-                <Link href="/profile" className="block hover:underline">
-                    Profile
-                </Link>
                 <Link href="/buy-airtime" className="block hover:underline">
                     📱 Buy Airtime
                 </Link>
