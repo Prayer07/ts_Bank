@@ -45,8 +45,8 @@
     }
 
     // Update balances
-    sender.balance -= amount;
-    receiver.balance += amount;
+    sender.balance -= amt;
+    receiver.balance += amt;
 
     const newTx = {
         type: 'transfer',
