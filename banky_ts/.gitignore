@@ -40,3 +40,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+ts-bank-firebase-adminsdk-fbsvc-68aa9a3495.json

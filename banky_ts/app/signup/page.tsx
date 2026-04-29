@@ -1,99 +1,142 @@
-'use client'
+"use client"
+import { useState, useEffect } from "react";
+import { auth } from "../../services/firebase";
+import { ConfirmationResult, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import PasswordInput from "../../components/PasswordInput";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { signIn } from 'next-auth/react'
-import { FcGoogle } from "react-icons/fc"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import toast from 'react-hot-toast'
-import PasswordInput from '../../components/PasswordInput'
-
-export default function SignupPage() {
-  const router = useRouter()
+export default function Signup() {
+  const router = useRouter();
+  const [step, setStep] = useState<"form" | "otp">("form");
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
-    fullname: '',
-    email: '',
-    password: ''
-  })
+    fullname: "",
+    phone: "",
+    password: "",
+  });
 
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [otp, setOtp] = useState("");
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+  useEffect(() => {
+    // create recaptcha
+    generateRecaptcha();
+  }, []);
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setForm({...form, [e.target.name]: e.target.value});
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
-
-    if (form.password.length < 6) {
-      setLoading(false)
-      return setError('Password is weak')
-    }
+  async function requestOtp(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
 
     try {
-      const res = await fetch('/api/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
-      })
+      // check phone formatting here (caller provides plain 080.... or +234)
+      const phone = form.phone.startsWith("+") ? form.phone : `+234${form.phone.replace(/^0+/, "")}`;
 
-      const data = await res.json()
+      // optionally check phone not empty
+      if (!phone) throw new Error("Phone is required");
 
-      if (!res.ok) {
-        throw new Error(data.error || 'Something went wrong')
-      }
-      
-      toast.success("Signed up successfully")
-      setTimeout(() => {
-        router.push('/login')
-      }, 1500)
+      // send otp
+      const appVerifier = window.recaptchaVerifier;
+      const result = await signInWithPhoneNumber(auth, phone, appVerifier!);
+      setConfirmationResult(result);
+      setStep("otp");
+      toast.success("OTP sent");
+    } catch (err) {
+        let message = "Signup failed";
+        
+        if (err instanceof Error) {
+          message = err.message;
+        } else if (typeof err === "string") {
+          message = err;
+        }
 
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message)
-      } else {
-        setError('An unexpected error occurred')
-      }
+        toast.error(message);
     } finally {
-      setLoading(false)
+      setLoading(false);
+    }
+  }
+
+  async function confirmOtp(e: React.FormEvent) {
+    e.preventDefault();
+    if (!confirmationResult) return toast.error("Request OTP first");
+
+    try {
+      setLoading(true);
+      const userCred = await confirmationResult.confirm(otp);
+      const uid = userCred.user.uid;
+      // send to your server to create user & hash password
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uid,
+          fullname: form.fullname,
+          phone: form.phone,
+          password: form.password,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.message || "Signup failed");
+      toast.success("Account created");
+      router.push("/dashboard");
+    } catch (err) {
+        let message = "Invalid OTP or signup failed";
+        
+        if (err instanceof Error) {
+          message = err.message;
+        } else if (typeof err === "string") {
+          message = err;
+        }
+
+        toast.error(message);
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card className="w-full max-w-md shadow-xl border border-gray-800 bg-card">
+    <>
+    <div id="recaptcha-container"></div>
+    {step === "form" &&(
+    <div className="min-h-screen bg-[#0F0F14] flex items-center justify-center px-4">
+      <Card className="w-full max-w-md bg-[#1A1F2C] border border-[#2A2F3C] shadow-2xl rounded-2xl">
         <CardHeader>
-          <CardTitle className="text-center text-2xl font-bold text-foreground">
-            Create Account
+          <CardTitle className="text-center text-2xl font-bold 
+            bg-gradient-to-r from-[#0052FF] to-[#7B2FF7] 
+            bg-clip-text text-transparent">
+            Create your Banky Account
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={requestOtp} className="space-y-5">
+
             <Input
               name="fullname"
               type="text"
-              placeholder="Full Name"
+              placeholder="Full name"
               value={form.fullname}
               onChange={handleChange}
               required
-              className="w-full rounded-md border border-input bg-background px-3 py-2 pr-10 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              className="w-full rounded-md border border-input bg-[#111827] border-[#2A2F3C] px-3 py-2 pr-10 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             />
 
             <Input
-              name="email"
-              type="email"
-              placeholder="Email Address"
-              value={form.email}
+              name="phone"
+              type="number"
+              placeholder="Phone Number"
+              value={form.phone}
               onChange={handleChange}
               required
-              className="w-full rounded-md border border-input bg-background px-3 py-2 pr-10 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              className="w-full rounded-md border border-input bg-[#111827] border-[#2A2F3C] px-3 py-2 pr-10 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             />
 
             <PasswordInput
@@ -104,41 +147,76 @@ export default function SignupPage() {
               required
             />
 
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-
             <Button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl"
+              className="w-full rounded-xl py-3 font-semibold 
+                          bg-gradient-to-r from-[#0052FF] to-[#7B2FF7] 
+                          hover:opacity-90 pointer"
             >
-              {loading ? 'Creating Account...' : 'Create Account'}
+              {loading ? "Sending OTP..." : "Continue"}
             </Button>
 
-            <p className="text-sm text-center text-muted-foreground">
-              Already have an account?{" "}
-              <Link href="/login" className="text-yellow-400 underline">
+            <p 
+              className="text-sm text-center text-muted-foreground ">
+              Don&apos;t have an account?{" "}
+              <a 
+                href="/login" 
+                className="text-blue-400 underline"
+              >
                 Login
-              </Link>
+              </a>
             </p>
 
-            <div className="flex items-center gap-2">
-              <div className="flex-1 h-px bg-gray-700" />
-              <span className="text-muted-foreground text-sm">OR</span>
-              <div className="flex-1 h-px bg-gray-700" />
-            </div>
-
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => signIn("google", { redirectTo: "/dashboard" })}
-              className="w-full flex items-center justify-center gap-2 rounded-xl"
-            >
-              <FcGoogle size={22} />
-              <span>Continue with Google</span>
-            </Button>
           </form>
         </CardContent>
       </Card>
     </div>
-  )
+  )}
+
+  {step === "otp" && (
+  <div className="min-h-screen bg-[#0F0F14] flex items-center justify-center px-4">
+    <Card className="w-full max-w-md bg-[#1A1F2C] border border-[#2A2F3C] shadow-2xl rounded-2xl">
+      <CardHeader>
+        <CardTitle className="text-center text-2xl font-bold 
+          bg-gradient-to-r from-[#0052FF] to-[#7B2FF7] 
+          bg-clip-text text-transparent">
+          Create your Banky Account
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={confirmOtp} className="space-y-5">
+
+          <Input
+            placeholder="Enter OTP"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            className="w-full rounded-md border border-input bg-[#111827] border-[#2A2F3C] px-3 py-2 pr-10 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          />
+
+          <Button 
+            disabled={loading} 
+            className="w-full rounded-xl py-3 font-semibold 
+                        bg-gradient-to-r from-[#0052FF] to-[#7B2FF7] 
+                        hover:opacity-90 pointer"
+          >
+            {loading ? "Verifying..." : "Verify OTP"}
+          </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  )}
+  </>
+  );
+}
+
+function generateRecaptcha() {
+  if (typeof window !== "undefined") {
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+        size: "invisible",
+      });
+    }
+  }
 }

@@ -1,71 +1,53 @@
-'use client'
+// app/dashboard/page.tsx
+"use client";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { User } from "../../types/UserData";
+import { Button } from "@/components/ui/button";
 
-import React, { useEffect, useState } from 'react'
-import GoogleUsers from '../../components/GoogleUsers'
-import { useSession } from 'next-auth/react'
-import NormalUsers from '../../components/NormalUsers'
-import { jwtDecode } from 'jwt-decode'
-import { motion } from 'framer-motion'
-import { useRouter } from 'next/navigation'
+export default function DashboardPage() {
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-interface DecodedToken {
-    _id: string
-    fullname: string
-    email: string
-    exp: number
-}
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then(async (res) => {
+        if (!res.ok) throw new Error("Not authenticated");
+        const data = await res.json();
+        setUser(data.user);
+      })
+      .catch(() => {
+        router.replace("/login");
+      })
+      .finally(() => setLoading(false));
+  }, [router]);
 
-function Page() {
-    const { data: session, status } = useSession()
-    const [isNormalUser, setIsNormalUser] = useState(false)
-    const router = useRouter()
+  const logout = async () =>{
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/login");
+  }
 
-    useEffect(() => {
-        const token = sessionStorage.getItem('token')
+  if (loading) return <p>Loading...</p>;
 
-        if (token) {
-        try {
-            const decoded: DecodedToken = jwtDecode(token)
-            if (decoded.exp * 1000 > Date.now()) {
-            setIsNormalUser(true)
-            return
-            } else {
-            sessionStorage.removeItem('token')
-            }
-        } catch (err) {
-            console.error('Invalid token', err)
-        }
-        }
+  return (
+    <div className="min-h-screen bg-[#0F0F14] text-white p-6">
+      <h1 className="text-3xl font-bold">
+        Hi, <span className="text-[#7B2FF7]">{user?.fullname}</span>
+      </h1>
+      <p className="text-gray-400 mt-2">UID: {user?.uid}</p>
+      <p className="text-gray-400 mt-2">Balance: {user?.balance}</p>
+      <p className="text-gray-400 mt-2">AccountNo: {user?.accountNo}</p>
 
-        // 🔹 Only check Google session if no valid normal-user token
-        if (status === 'unauthenticated') {
-        router.push('/login')
-        }
-    }, [status, router])
+      <a href="/add-money">Add money {"  "}</a>
+      <a href="/transfer">Transfer money</a>
 
-    if (status === 'loading') {
-        return (
-        <div className="min-h-screen flex items-center justify-center p-4">
-            <motion.div
-            className="text-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            >
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mb-4"></div>
-            </motion.div>
-        </div>
-        )
-    }
-
-    if (isNormalUser) {
-        return <NormalUsers />
-    }
-
-    if (session) {
-        return <GoogleUsers />
-    }
-
-    return null
-}
-
-export default Page
+      <Button
+        onClick={logout}
+        className="mt-6 bg-gradient-to-r from-[#0052FF] to-[#7B2FF7] py-3 px-4 rounded-xl pointer"
+      >
+        Logout
+      </Button>
+    </div>
+  );
+} 

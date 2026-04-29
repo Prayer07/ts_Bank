@@ -1,57 +1,78 @@
-'use client'
+"use client"
 
-import React, { useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
-import { jwtDecode } from 'jwt-decode'
-import NormalUserTransfer from '../../components/NormalUserTransfer'
-import GoogleTransfer from '../../components/GoogleTransfer'
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import toast from "react-hot-toast"
+import axios from "axios"
 
-interface DecodedToken {
-    _id: string
-    fullname: string
-    email: string
-    exp: number
-}
+export default function TransferPage() {
+  const [accountNo, setAccountNo] = useState("")
+  const [amount, setAmount] = useState("")
+  const [loading, setLoading] = useState(false)
 
+  const sendMoney = async () => {
+    if (!accountNo || !amount) {
+      toast.error("All fields are required")
+      return
+    }
 
-function Page() {
-    const {data: session, status} = useSession()
-    const [isNormalUser, setIsNormalUser] = useState(false)
+    setLoading(true)
 
-    useEffect(() => {
-        const token = sessionStorage.getItem("token")
-        if (token){
-            try {
-                const decoded: DecodedToken = jwtDecode(token)
-                if (decoded.exp * 1000 > Date.now()){
-                    setIsNormalUser(true)
-                }else{
-                    sessionStorage.removeItem("token")
-                    setIsNormalUser(false)
-                }
-            }catch (err: unknown) {
-                if(err instanceof Error){
-                    console.error("Invalid token", err)
-                    setIsNormalUser(false)
-                }else{
-                    console.error("Something went wrong")
-                }
-            }
+    try {
+      const res = await axios.post("/api/transactions/transfer", {
+        accountNo,
+        amount,
+      })
+
+      toast.success("Transfer successful!")
+      window.location.href = `/receipt/${res.data.receiptId}`
+
+    } catch (err) {
+        let message = "Transfer failed";
+        
+        if (err instanceof Error) {
+          message = err.message;
+        } else if (typeof err === "string") {
+          message = err;
         }
-    }, [isNormalUser, session])
 
-    if (isNormalUser) {
-        return <NormalUserTransfer/>
+        toast.error(message);
     }
 
-    if (status === "loading") return
-            <div className="flex items-center justify-center min-h-screen text-gray-600">
-                Loading...
-            </div>
+    setLoading(false)
+  }
 
-    if (session) {
-        return <GoogleTransfer/>
-    }
+  return (
+    <div className="min-h-screen flex items-center justify-center px-6 bg-background">
+      <div className="w-full max-w-md bg-card p-6 rounded-2xl shadow-xl border border-gray-800">
+        <h1 className="text-2xl font-bold text-center mb-4">
+          Transfer Money
+        </h1>
+
+        <Input
+          placeholder="Receiver Account Number"
+          value={accountNo}
+          onChange={(e) => setAccountNo(e.target.value)}
+          className="mb-4 rounded-xl bg-background border-gray-700"
+        />
+
+        <Input
+          type="number"
+          placeholder="Amount"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          className="mb-4 rounded-xl bg-background border-gray-700"
+        />
+
+        <Button
+          onClick={sendMoney}
+          disabled={loading}
+          className="w-full rounded-xl"
+        >
+          {loading ? "Processing..." : "Send Money"}
+        </Button>
+      </div>
+    </div>
+  )
 }
-
-export default Page
